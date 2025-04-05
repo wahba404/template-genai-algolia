@@ -1,5 +1,15 @@
 node_modules/
 dist/
+.env
 *.log
 *.env
-.env
+
+.AppleDouble
+.LSOverride
+
+.DS_Store
+.DS_*
+*.log
+logs
+**/*.backup.*
+**/*.back.*
