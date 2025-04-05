@@ -96,7 +96,11 @@ function App() {
             ))}
           </div>
           <div className='flex border-t border-gray-200 p-4 items-center gap-2'>
-            <form autoComplete='off' onSubmit={handleMessageSubmit} className='flex-grow'>
+            <form
+              autoComplete='off'
+              onSubmit={handleMessageSubmit}
+              className='flex-grow'
+            >
               <input
                 type='text'
                 name='message'
