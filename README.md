@@ -32,7 +32,7 @@ Follow these steps to run the project locally:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/genaitoolkit.git
+git clone https://github.com/WabaScript/genaitoolkit.git
 cd genaitoolkit/genapp
 ```
 
