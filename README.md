@@ -1,15 +1,6 @@
 # GenAI Toolkit - E-Commerce Starter Template
 
-Welcome to the **GenAI Toolkit**, a starter template designed to kickstart your e-commerce experience with a focus on integrating a chatbot powered by **Ollama** and the **Llama 3.2 model**. This project is built using **React**, **Vite**, **TailwindCSS**, and **Flowbite-React** for a modern and responsive user interface.
-
----
-
-## Features
-
-- **Chatbot Integration**: A conversational chatbot interface powered by Ollama's Llama 3.2 model.
-- **Responsive Design**: Built with TailwindCSS for seamless responsiveness.
-- **Reusable Components**: Includes pre-built components like a carousel.
-- **Dark Mode Support**: Fully supports light and dark themes.
+Welcome to the **GenAI Toolkit**, a starter template designed to kickstart your e-commerce experience with a focus on integrating a chatbot powered by **Ollama** and the **Llama 3.2 model**. Now with **multi-modal capabilities** as well via **Llama 3.2 vision**. This project is built using **React**, **Vite**, **TailwindCSS**, and **Flowbite-React** for a modern and responsive user interface.
 
 ---
 
@@ -71,6 +62,32 @@ If you encounter any issues, try the following:
    ```bash
    ollama list
    ```
+
+---
+
+## Features
+
+- **Chatbot Integration**: A conversational chatbot interface powered by Ollama's Llama 3.2 model.
+- **Multi-Modal Capabilities**: Supports both text and image-based interactions, enabling richer user experiences.
+- **Responsive Design**: Built with TailwindCSS for seamless responsiveness.
+- **Reusable Components**: Includes pre-built components like a carousel.
+- **Dark Mode Support**: Fully supports light and dark themes.
+
+---
+
+## Multi-Modal Capabilities
+
+The GenAI Toolkit now supports multi-modal interactions, allowing users to:
+
+1. **Text-Based Chat**: Communicate with the chatbot using natural language.
+2. **Image-Based Queries**: Upload images to receive context-aware responses or recommendations.
+
+### How It Works
+
+- **Text Input**: The chatbot processes user queries using the Llama 3.2 model.
+- **Image Input**: Images are analyzed using integrated AI tools, and results are combined with text-based responses for a seamless experience.
+
+To enable image-based interactions, ensure you have the necessary dependencies installed. Refer to the `utils/` folder for helper functions related to image processing.
 
 ---
 
