@@ -80,6 +80,10 @@ export const useOllamaChat = () => {
         // store llm response
         const finalMessage = { role: 'assistant', content: finalResponse };
         addLlmMessage(finalMessage);
+        // testing llm image/non-image convo continuation
+        console.log("last user message:", payload);
+        console.log('Final message:', finalMessage);
+        console.log('current full chat llmMessage:', llmMessages)
       }
     } catch (error) {
       if (error.name === 'AbortError') {

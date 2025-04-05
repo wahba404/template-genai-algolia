@@ -1,12 +1,9 @@
 import React, { useState, useRef } from 'react';
 import Footer from './components/common/Footer';
 import Carousel from './components/common/Carousel';
+import ImageModal from './components/common/ImageModal';
 import {
   TextInput,
-  Button,
-  Modal,
-  ModalBody,
-  ModalHeader,
 } from 'flowbite-react';
 import { useChat } from './context/ChatContext';
 import { useOllamaChat } from './utils/ollama';
@@ -14,9 +11,10 @@ import { useOllamaChat } from './utils/ollama';
 function App() {
   const fileInputRef = useRef(null);
   const { chatMessages, addMessage } = useChat();
+  const { sendMessage, stopStreaming, isStreaming } = useOllamaChat();
   const [attachments, setAttachments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { sendMessage, stopStreaming, isStreaming } = useOllamaChat();
+  const [modalImages, setModalImages] = useState([]);
 
   // Example function to handle message submission
   const handleMessageSubmit = (event) => {
@@ -59,6 +57,12 @@ function App() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  // pass images to modal
+  const openModalWithImages = (images) => {
+    setModalImages(images);
+    setIsModalOpen(true);
   };
 
   return (
@@ -120,6 +124,7 @@ function App() {
                             src={att.preview}
                             alt={`attachment-${index}`}
                             className='w-10 h-10 object-cover rounded-md'
+                            onClick={() => openModalWithImages(message.attachments)}
                           />
                         ))}
                       </div>
@@ -144,7 +149,7 @@ function App() {
             </form>
             {attachments.length > 0 && (
               <div
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => openModalWithImages(attachments)}
                 className='cursor-pointer relative'
               >
                 <img
@@ -241,41 +246,12 @@ function App() {
         </section>
       </div>
 
-      {/* Modal to display attachments */}
-      {isModalOpen && (
-        <Modal
-          dismissible
-          show={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        >
-          <ModalHeader>
-            <Button
-              onClick={() => setIsModalOpen(false)}
-              className='absolute top-2 right-2'
-              color='gray'
-            >
-              X
-            </Button>
-          </ModalHeader>
-          <ModalBody>
-            <div
-              className='grid gap-2'
-              style={{
-                gridTemplateColumns: `repeat(auto-fit, minmax(150px, 1fr))`,
-              }}
-            >
-              {attachments.map((attachment, index) => (
-                <img
-                  key={index}
-                  src={attachment.preview}
-                  alt={`attachment-${index}`}
-                  className='max-h-96 object-contain'
-                />
-              ))}
-            </div>
-          </ModalBody>
-        </Modal>
-      )}
+      <ImageModal
+        images={modalImages}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+      {/* Footer */}
       <Footer />
     </>
   );
