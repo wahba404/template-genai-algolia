@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Footer from './components/common/Footer';
 import Carousel from './components/common/Carousel';
-import { TextInput } from 'flowbite-react';
+import {
+  TextInput,
+  Button,
+  Modal,
+  ModalBody,
+  ModalHeader,
+} from 'flowbite-react';
 import { useChat } from './context/ChatContext';
-import { useOllamaChat } from './utils/ollama';
+// import { useOllamaChat } from './utils/ollama';
+
+
 
 function App() {
   // Example chat messages with metadata
@@ -28,8 +36,11 @@ function App() {
   // ];
 
   // const [chatMessages, setChatMessages] = useState(messages);
-  const { chatMessages } = useChat();
-  const { sendMessage, stopStreaming, isStreaming } = useOllamaChat();
+  const fileInputRef = useRef(null);
+  const { chatMessages, addMessage } = useChat();
+  const [attachments, setAttachments] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const { sendMessage, stopStreaming, isStreaming } = useOllamaChat();
 
   // Example function to handle message submission
   const handleMessageSubmit = (event) => {
@@ -37,8 +48,34 @@ function App() {
     const input = event.target.elements.message;
     const userMessage = input.value.trim();
     if (userMessage) {
-      sendMessage(userMessage);
-      input.value = ''; // Clear the input field
+      // For now, add the message along with any attachments to the chat.
+      addMessage({
+        text: userMessage,
+        sender: 'user',
+        type: 'text',
+        attachments,
+      });
+      // Clear the input and attachments after sending.
+      input.value = '';
+      setAttachments([]);
+    }
+  };
+
+  // Handle file selection from the file picker
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Use FileReader to convert the image file to a base64 preview.
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64Preview = reader.result;
+        // Add the image details to attachments.
+        setAttachments((prev) => [
+          ...prev,
+          { preview: base64Preview, fileName: file.name },
+        ]);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -91,6 +128,21 @@ function App() {
                   }`}
                 >
                   {message.text || '...'}
+                  {message.attachments && message.attachments.length > 0 && (
+                    <div className='mt-2 flex items-center gap-2'>
+                      <small>📎</small>
+                      <div className='flex gap-2'>
+                        {message.attachments.map((att, index) => (
+                          <img
+                            key={index}
+                            src={att.preview}
+                            alt={`attachment-${index}`}
+                            className='w-10 h-10 object-cover rounded-md'
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -108,7 +160,40 @@ function App() {
                 className='w-full h-10 p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-white'
               />
             </form>
-            {isStreaming && (
+            {attachments.length > 0 && (
+              <div
+                onClick={() => setIsModalOpen(true)}
+                className='cursor-pointer relative'
+              >
+                <img
+                  src={attachments[0].preview}
+                  alt='attachment thumbnail'
+                  className='h-10 w-10 object-cover rounded-md'
+                />
+                {attachments.length > 1 && (
+                  <span className='absolute top-0 right-0 bg-blue-500 text-white text-xs rounded-full px-1'>
+                    +{attachments.length - 1}
+                  </span>
+                )}
+              </div>
+            )}
+            {/* Button to trigger the file picker */}
+            <button
+              className='cursor-pointer text-white p-2 rounded-full flex items-center justify-center w-10 h-10 bg-blue-500'
+              onClick={() => fileInputRef.current.click()}
+              title='Attach Image'
+            >
+              📎
+            </button>
+            {/* Hidden file input */}
+            <input
+              type='file'
+              accept='image/*'
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              style={{ display: 'none' }}
+            />
+            {7 == 6 && (
               <button
                 className='text-white p-2 rounded-full flex items-center justify-center w-10 h-10'
                 onClick={() => {
@@ -173,6 +258,42 @@ function App() {
           {/* <Carousel /> */}
         </section>
       </div>
+
+      {/* Modal to display attachments */}
+      {isModalOpen && (
+        <Modal
+          dismissible
+          show={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        >
+          <ModalHeader>
+            <Button
+              onClick={() => setIsModalOpen(false)}
+              className='absolute top-2 right-2'
+              color='gray'
+            >
+              X
+            </Button>
+          </ModalHeader>
+          <ModalBody>
+            <div
+              className='grid gap-2'
+              style={{
+                gridTemplateColumns: `repeat(auto-fit, minmax(150px, 1fr))`,
+              }}
+            >
+              {attachments.map((attachment, index) => (
+                <img
+                  key={index}
+                  src={attachment.preview}
+                  alt={`attachment-${index}`}
+                  className='max-h-96 object-contain'
+                />
+              ))}
+            </div>
+          </ModalBody>
+        </Modal>
+      )}
       <Footer />
     </>
   );
