@@ -9,52 +9,33 @@ import {
   ModalHeader,
 } from 'flowbite-react';
 import { useChat } from './context/ChatContext';
-// import { useOllamaChat } from './utils/ollama';
-
-
+import { useOllamaChat } from './utils/ollama';
 
 function App() {
-  // Example chat messages with metadata
-  // const messages = [
-  //   { text: "Hello!", sender: "bot" },
-  //   { text: "Hi there!", sender: "user" },
-  //   { text: "How are you doing today?", sender: "bot" },
-  //   {
-  //     text: "I'm doing great, thanks for asking! How about you?",
-  //     sender: "user",
-  //   },
-  //   { text: "I'm good too. Just working on some projects.", sender: "bot" },
-  //   {
-  //     text: "That sounds interesting! Let me know if you need help.",
-  //     sender: "user",
-  //   },
-  //   {
-  //     text: "Sure, I'll reach out if I need assistance. Thanks!",
-  //     sender: "bot",
-  //   },
-  //   { text: "You're welcome!", sender: "user" },
-  // ];
-
-  // const [chatMessages, setChatMessages] = useState(messages);
   const fileInputRef = useRef(null);
   const { chatMessages, addMessage } = useChat();
   const [attachments, setAttachments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const { sendMessage, stopStreaming, isStreaming } = useOllamaChat();
+  const { sendMessage, stopStreaming, isStreaming } = useOllamaChat();
 
   // Example function to handle message submission
   const handleMessageSubmit = (event) => {
     event.preventDefault();
     const input = event.target.elements.message;
-    const userMessage = input.value.trim();
-    if (userMessage) {
-      // For now, add the message along with any attachments to the chat.
+    const text = input.value.trim();
+    // Allow sending if there's text or at least one attachment.
+    if (text || attachments.length > 0) {
+      // Create a message payload for the backend.
+      const messagePayload = { text, attachments };
+      // Immediately add the user message to the UI.
       addMessage({
-        text: userMessage,
+        text,
         sender: 'user',
         type: 'text',
         attachments,
       });
+      // Pass the payload to the backend.
+      sendMessage(messagePayload);
       // Clear the input and attachments after sending.
       input.value = '';
       setAttachments([]);
@@ -69,10 +50,11 @@ function App() {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64Preview = reader.result;
+        const base64Data = base64Preview.split(',')[1]; // Extract base64 data
         // Add the image details to attachments.
         setAttachments((prev) => [
           ...prev,
-          { preview: base64Preview, fileName: file.name },
+          { preview: base64Preview, raw: base64Data, fileName: file.name },
         ]);
       };
       reader.readAsDataURL(file);
@@ -193,7 +175,7 @@ function App() {
               onChange={handleImageChange}
               style={{ display: 'none' }}
             />
-            {7 == 6 && (
+            {isStreaming && (
               <button
                 className='text-white p-2 rounded-full flex items-center justify-center w-10 h-10'
                 onClick={() => {
