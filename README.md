@@ -85,7 +85,8 @@ The GenAI Toolkit now supports multi-modal interactions, allowing users to:
 ### How It Works
 
 - **Text Input**: The chatbot processes user queries using the Llama 3.2 model.
-- **Image Input**: Images are analyzed using integrated AI tools, and results are combined with text-based responses for a seamless experience.
+- **Image Input**: When images are added to the payload, the Llama 3.2-vision model is used to power the request.
+- **Seamless Flow**: Text and images are all kept within context to keep the coversation flowing naturally whether its text based, image based, or both!
 
 To enable image-based interactions, ensure you have the necessary dependencies installed. Refer to the `utils/` folder for helper functions related to image processing.
 
