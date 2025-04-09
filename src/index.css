@@ -10,3 +10,7 @@ body {
   height: 100vh;
   @apply dark:bg-gray-900;
 }
+
+button {
+  @apply cursor-pointer;
+}

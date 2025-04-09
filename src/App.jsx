@@ -65,6 +65,12 @@ function App() {
     setIsModalOpen(true);
   };
 
+  // handle image removal from the modal
+  const handleRemoveImage = (index) => {
+    setModalImages((prev) => prev.filter((_, i) => i !== index));
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return (
     <>
       <div className='min-h-screen bg-gray-50 p-6 max-w-full mx-auto grid grid-cols-4 gap-x-6 gap-y-1 dark:bg-gray-900'>
@@ -87,11 +93,9 @@ function App() {
           <div className='border-b border-gray-200 p-4'>
             <h2 className='text-lg font-semibold'>Chat</h2>
           </div>
-          {/* Chat messages container: flex-1 ensures it grows to fill space,
-                  overflow-y-auto enables vertical scrolling */}
           <div
             className='p-4 overflow-y-auto space-y-4 flex-1'
-            style={{ height: '500px', maxHeight: '500px' }} // Assuming each message is ~3.5rem tall
+            style={{ height: '500px', maxHeight: '500px' }}
             ref={(el) => {
               if (el) {
                 el.scrollTop = el.scrollHeight;
@@ -99,7 +103,7 @@ function App() {
             }}
           >
             {chatMessages.map((message, index) => (
-              // Wrap each bubble in a flex container to control its alignment
+              // wrap each bubble in a flex container to control its alignment
               <div
                 key={index}
                 className={`flex ${
@@ -250,6 +254,11 @@ function App() {
         images={modalImages}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onRemoveImage={handleRemoveImage}
+        onAddMore={() => {
+          setIsModalOpen(false);
+          fileInputRef.current.click();
+        }}
       />
       {/* Footer */}
       <Footer />
