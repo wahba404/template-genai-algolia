@@ -3,8 +3,7 @@ import { useChat } from '../context/ChatContext';
 import { useRef, useState } from 'react';
 
 export const useOllamaChat = () => {
-  const { addMessage, updateLastMessage, addLlmMessage, llmMessages } =
-    useChat();
+  const { addMessage, updateLastMessage, addLlmMessage, llmMessages } = useChat();
   // Ref to store the current Ollama client instance
   const currentClientRef = useRef(null);
   // State flag to indicate if streaming is in progress
@@ -19,14 +18,27 @@ export const useOllamaChat = () => {
     // Start streaming, disable new input
     setIsStreaming(true);
 
-    // Add the user's message to the chat
-    addMessage({ text: userMessage, sender: 'user' });
-    // Prepare the message for the LLM
-    const message = { role: 'user', content: userMessage };
-    // pass to llm below
-    const updatedLlmMessages = [...llmMessages, message];
+    // Build the payload for the backend.
+    // If attachments exist, ensure content is not empty; default to a prompt.
+    let payload;
+    if (typeof userMessage === 'object') {
+      if (userMessage.attachments && userMessage.attachments.length > 0) {
+        payload = {
+          role: 'user',
+          content: userMessage.text || 'What is in this image?',
+          images: userMessage.attachments.map((att) => att.raw),
+        };
+      } else {
+        payload = { role: 'user', content: userMessage.text };
+      }
+    } else {
+      payload = { role: 'user', content: userMessage };
+    }
 
-    // Add a placeholder for the bot's response
+    // Update llmMessages with the new payload
+    const updatedLlmMessages = [...llmMessages, payload];
+
+// Add a placeholder for the bot's response
     const botMessageId = addMessage({
       text: '',
       sender: 'bot',
@@ -38,10 +50,14 @@ export const useOllamaChat = () => {
     currentClientRef.current = client;
 
     try {
-      // Start streaming the response from Ollama. Note:
-      // Depending on your API, you may need to adjust how conversation context is passed.
+      // Choose the model based on whether attachments are present.
+      const modelName =
+        typeof userMessage === 'object' && userMessage.attachments?.length > 0
+          ? 'llama3.2-vision'
+          : 'llama3.2';
+
       const stream = await client.chat({
-        model: 'llama3.2',
+        model: modelName,
         messages: updatedLlmMessages,
         stream: true,
       });
@@ -57,16 +73,17 @@ export const useOllamaChat = () => {
         }));
       }
 
-      // if you didnt want to stream to the ui
-      // updateLastMessage(botMessageId, { text: finalResponse });
-
       // Only store the final message if it wasn't stopped
       if (finalResponse) {
         // store the user message in the LLM messages
-        addLlmMessage(message);
+        addLlmMessage(payload);
         // store llm response
         const finalMessage = { role: 'assistant', content: finalResponse };
         addLlmMessage(finalMessage);
+        // testing llm image/non-image convo continuation
+        console.log("last user message:", payload);
+        console.log('Final message:', finalMessage);
+        console.log('current full chat llmMessage:', llmMessages)
       }
     } catch (error) {
       if (error.name === 'AbortError') {

@@ -1,45 +1,74 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Footer from './components/common/Footer';
 import Carousel from './components/common/Carousel';
-import { TextInput } from 'flowbite-react';
+import ImageModal from './components/common/ImageModal';
+import {
+  TextInput,
+} from 'flowbite-react';
 import { useChat } from './context/ChatContext';
 import { useOllamaChat } from './utils/ollama';
 
 function App() {
-  // Example chat messages with metadata
-  // const messages = [
-  //   { text: "Hello!", sender: "bot" },
-  //   { text: "Hi there!", sender: "user" },
-  //   { text: "How are you doing today?", sender: "bot" },
-  //   {
-  //     text: "I'm doing great, thanks for asking! How about you?",
-  //     sender: "user",
-  //   },
-  //   { text: "I'm good too. Just working on some projects.", sender: "bot" },
-  //   {
-  //     text: "That sounds interesting! Let me know if you need help.",
-  //     sender: "user",
-  //   },
-  //   {
-  //     text: "Sure, I'll reach out if I need assistance. Thanks!",
-  //     sender: "bot",
-  //   },
-  //   { text: "You're welcome!", sender: "user" },
-  // ];
-
-  // const [chatMessages, setChatMessages] = useState(messages);
-  const { chatMessages } = useChat();
+  const fileInputRef = useRef(null);
+  const { chatMessages, addMessage } = useChat();
   const { sendMessage, stopStreaming, isStreaming } = useOllamaChat();
+  const [attachments, setAttachments] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImages, setModalImages] = useState([]);
 
   // Example function to handle message submission
   const handleMessageSubmit = (event) => {
     event.preventDefault();
     const input = event.target.elements.message;
-    const userMessage = input.value.trim();
-    if (userMessage) {
-      sendMessage(userMessage);
-      input.value = ''; // Clear the input field
+    const text = input.value.trim();
+    // Allow sending if there's text or at least one attachment.
+    if (text || attachments.length > 0) {
+      // Create a message payload for the backend.
+      const messagePayload = { text, attachments };
+      // Immediately add the user message to the UI.
+      addMessage({
+        text,
+        sender: 'user',
+        type: 'text',
+        attachments,
+      });
+      // Pass the payload to the backend.
+      sendMessage(messagePayload);
+      // Clear the input and attachments after sending.
+      input.value = '';
+      setAttachments([]);
     }
+  };
+
+  // Handle file selection from the file picker
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Use FileReader to convert the image file to a base64 preview.
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64Preview = reader.result;
+        const base64Data = base64Preview.split(',')[1]; // Extract base64 data
+        // Add the image details to attachments.
+        setAttachments((prev) => [
+          ...prev,
+          { preview: base64Preview, raw: base64Data, fileName: file.name },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // pass images to modal
+  const openModalWithImages = (images) => {
+    setModalImages(images);
+    setIsModalOpen(true);
+  };
+
+  // handle image removal from the modal
+  const handleRemoveImage = (index) => {
+    setModalImages((prev) => prev.filter((_, i) => i !== index));
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -64,11 +93,9 @@ function App() {
           <div className='border-b border-gray-200 p-4'>
             <h2 className='text-lg font-semibold'>Chat</h2>
           </div>
-          {/* Chat messages container: flex-1 ensures it grows to fill space,
-                  overflow-y-auto enables vertical scrolling */}
           <div
             className='p-4 overflow-y-auto space-y-4 flex-1'
-            style={{ height: '500px', maxHeight: '500px' }} // Assuming each message is ~3.5rem tall
+            style={{ height: '500px', maxHeight: '500px' }}
             ref={(el) => {
               if (el) {
                 el.scrollTop = el.scrollHeight;
@@ -76,7 +103,7 @@ function App() {
             }}
           >
             {chatMessages.map((message, index) => (
-              // Wrap each bubble in a flex container to control its alignment
+              // wrap each bubble in a flex container to control its alignment
               <div
                 key={index}
                 className={`flex ${
@@ -91,6 +118,22 @@ function App() {
                   }`}
                 >
                   {message.text || '...'}
+                  {message.attachments && message.attachments.length > 0 && (
+                    <div className='mt-2 flex items-center gap-2'>
+                      <small>📎</small>
+                      <div className='flex gap-2'>
+                        {message.attachments.map((att, index) => (
+                          <img
+                            key={index}
+                            src={att.preview}
+                            alt={`attachment-${index}`}
+                            className='w-10 h-10 object-cover rounded-md'
+                            onClick={() => openModalWithImages(message.attachments)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -108,9 +151,42 @@ function App() {
                 className='w-full h-10 p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-white'
               />
             </form>
+            {attachments.length > 0 && (
+              <div
+                onClick={() => openModalWithImages(attachments)}
+                className='cursor-pointer relative'
+              >
+                <img
+                  src={attachments[0].preview}
+                  alt='attachment thumbnail'
+                  className='h-10 w-10 object-cover rounded-md'
+                />
+                {attachments.length > 1 && (
+                  <span className='absolute top-0 right-0 bg-blue-500 text-white text-xs rounded-full px-1'>
+                    +{attachments.length - 1}
+                  </span>
+                )}
+              </div>
+            )}
+            {/* Button to trigger the file picker */}
+                  <button
+                    className='cursor-pointer text-white p-2 rounded-full flex items-center justify-center w-10 h-10 transform transition-transform hover:-translate-y-1 hover:translate-x-1'
+                    onClick={() => fileInputRef.current.click()}
+                    title='Attach Image'
+                  >
+                    📎
+                  </button>
+                  {/* Hidden file input */}
+            <input
+              type='file'
+              accept='image/*'
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              style={{ display: 'none' }}
+            />
             {isStreaming && (
               <button
-                className='text-white p-2 rounded-full flex items-center justify-center w-10 h-10'
+                className='text-white p-2 rounded-full flex items-center justify-center w-10 h-10 transform transition-transform hover:-translate-y-1 hover:translate-x-1'
                 onClick={() => {
                   console.log('Stop button clicked');
                   stopStreaming();
@@ -173,6 +249,18 @@ function App() {
           {/* <Carousel /> */}
         </section>
       </div>
+
+      <ImageModal
+        images={modalImages}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onRemoveImage={handleRemoveImage}
+        onAddMore={() => {
+          setIsModalOpen(false);
+          fileInputRef.current.click();
+        }}
+      />
+      {/* Footer */}
       <Footer />
     </>
   );
