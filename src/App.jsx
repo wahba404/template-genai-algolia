@@ -169,14 +169,14 @@ function App() {
               </div>
             )}
             {/* Button to trigger the file picker */}
-            <button
-              className='cursor-pointer text-white p-2 rounded-full flex items-center justify-center w-10 h-10 bg-blue-500'
-              onClick={() => fileInputRef.current.click()}
-              title='Attach Image'
-            >
-              📎
-            </button>
-            {/* Hidden file input */}
+                  <button
+                    className='cursor-pointer text-white p-2 rounded-full flex items-center justify-center w-10 h-10 transform transition-transform hover:-translate-y-1 hover:translate-x-1'
+                    onClick={() => fileInputRef.current.click()}
+                    title='Attach Image'
+                  >
+                    📎
+                  </button>
+                  {/* Hidden file input */}
             <input
               type='file'
               accept='image/*'
@@ -186,7 +186,7 @@ function App() {
             />
             {isStreaming && (
               <button
-                className='text-white p-2 rounded-full flex items-center justify-center w-10 h-10'
+                className='text-white p-2 rounded-full flex items-center justify-center w-10 h-10 transform transition-transform hover:-translate-y-1 hover:translate-x-1'
                 onClick={() => {
                   console.log('Stop button clicked');
                   stopStreaming();
