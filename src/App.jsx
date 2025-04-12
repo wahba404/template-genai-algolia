@@ -2,9 +2,9 @@ import React, { useState, useRef } from 'react';
 import Footer from './components/common/Footer';
 import Carousel from './components/common/Carousel';
 import ImageModal from './components/common/ImageModal';
-import {
-  TextInput,
-} from 'flowbite-react';
+import GroupCard from './components/common/GroupCard';
+import ProductCard from './components/common/ProductCard';
+import { TextInput } from 'flowbite-react';
 import { useChat } from './context/ChatContext';
 import { useOllamaChat } from './utils/ollama';
 
@@ -15,6 +15,7 @@ function App() {
   const [attachments, setAttachments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImages, setModalImages] = useState([]);
+  const [modalCanDelete, setModalCanDelete] = useState(true);
 
   // Example function to handle message submission
   const handleMessageSubmit = (event) => {
@@ -60,7 +61,7 @@ function App() {
   };
 
   // pass images to modal
-  const openModalWithImages = (images) => {
+  const openModalWithImages = (images, modalCanDelete = true) => {
     setModalImages(images);
     setIsModalOpen(true);
   };
@@ -128,7 +129,9 @@ function App() {
                             src={att.preview}
                             alt={`attachment-${index}`}
                             className='w-10 h-10 object-cover rounded-md'
-                            onClick={() => openModalWithImages(message.attachments)}
+                            onClick={() =>
+                              openModalWithImages(message.attachments, false)
+                            }
                           />
                         ))}
                       </div>
@@ -153,7 +156,7 @@ function App() {
             </form>
             {attachments.length > 0 && (
               <div
-                onClick={() => openModalWithImages(attachments)}
+                onClick={() => openModalWithImages(attachments, true)}
                 className='cursor-pointer relative'
               >
                 <img
@@ -169,14 +172,14 @@ function App() {
               </div>
             )}
             {/* Button to trigger the file picker */}
-                  <button
-                    className='cursor-pointer text-white p-2 rounded-full flex items-center justify-center w-10 h-10 transform transition-transform hover:-translate-y-1 hover:translate-x-1'
-                    onClick={() => fileInputRef.current.click()}
-                    title='Attach Image'
-                  >
-                    📎
-                  </button>
-                  {/* Hidden file input */}
+            <button
+              className='chat-button'
+              onClick={() => fileInputRef.current.click()}
+              title='Attach Image'
+            >
+              📎
+            </button>
+            {/* Hidden file input */}
             <input
               type='file'
               accept='image/*'
@@ -186,14 +189,14 @@ function App() {
             />
             {isStreaming && (
               <button
-                className='text-white p-2 rounded-full flex items-center justify-center w-10 h-10 transform transition-transform hover:-translate-y-1 hover:translate-x-1'
+                className='chat-button'
                 onClick={() => {
                   console.log('Stop button clicked');
                   stopStreaming();
                 }}
                 title='Stop Response'
               >
-                &#x1F6D1; {/* Unicode for stop sign symbol */}
+                🛑
               </button>
             )}
           </div>
@@ -204,49 +207,19 @@ function App() {
         {/* ------------------ */}
         <section className='mt-6 col-span-2 grid grid-cols-2 gap-6'>
           {/* Each product card is sized consistently using a fixed height */}
-          <div className='bg-white rounded-lg shadow p-4 flex items-center justify-center h-48 dark:bg-gray-800 dark:text-white'>
-            Product 1
-          </div>
-          <div className='bg-white rounded-lg shadow p-4 flex items-center justify-center h-48 dark:bg-gray-800 dark:text-white'>
-            Product 2
-          </div>
-          <div className='bg-white rounded-lg shadow p-4 flex items-center justify-center h-48 dark:bg-gray-800 dark:text-white'>
-            Product 3
-          </div>
-          <div className='bg-white rounded-lg shadow p-4 flex items-center justify-center h-48 dark:bg-gray-800 dark:text-white'>
-            Product 4
-          </div>
+          <ProductCard>Product 1</ProductCard>
+          <ProductCard>Product 2</ProductCard>
+          <ProductCard>Product 3</ProductCard>
+          <ProductCard>Product 4</ProductCard>
         </section>
 
         {/* ------------------ */}
         {/* Bottom Section: Groups and Carousel */}
         {/* ------------------ */}
         <section className='mt-6 col-span-4 flex items-start gap-6'>
-          {/* Group cards with fixed sizing */}
-          <div className='bg-white rounded-lg shadow p-4 w-64 h-128 flex items-center justify-center dark:bg-gray-800 dark:text-white'>
-            Group 1
-          </div>
-          <div className='bg-white rounded-lg shadow p-4 w-64 h-128 flex items-center justify-center dark:bg-gray-800 dark:text-white'>
-            Group 2
-          </div>
-          {/* Carousel using horizontal scrolling */}
-          <div className='flex-1 overflow-x-auto border border-gray-200 rounded-lg p-4'>
-            <div className='flex gap-6'>
-              <div className='bg-white rounded-lg shadow p-4 min-w-[200px] h-64 flex items-center justify-center dark:bg-gray-800 dark:text-white'>
-                Item 1
-              </div>
-              <div className='bg-white rounded-lg shadow p-4 min-w-[200px] h-64 flex items-center justify-center dark:bg-gray-800 dark:text-white'>
-                Item 2
-              </div>
-              <div className='bg-white rounded-lg shadow p-4 min-w-[200px] h-64 flex items-center justify-center dark:bg-gray-800 dark:text-white'>
-                Item 3
-              </div>
-              <div className='bg-white rounded-lg shadow p-4 min-w-[200px] h-64 flex items-center justify-center dark:bg-gray-800 dark:text-white'>
-                Item 4
-              </div>
-            </div>
-          </div>
-          {/* <Carousel /> */}
+          <GroupCard>Group 1</GroupCard>
+          <GroupCard>Group 2</GroupCard>
+          <Carousel />
         </section>
       </div>
 
@@ -254,11 +227,12 @@ function App() {
         images={modalImages}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onRemoveImage={handleRemoveImage}
+        onRemoveImage={modalCanDelete ? handleRemoveImage : null}
         onAddMore={() => {
           setIsModalOpen(false);
           fileInputRef.current.click();
         }}
+        modalCanDelete={modalCanDelete}
       />
       {/* Footer */}
       <Footer />
