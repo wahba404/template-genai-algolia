@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Modal, ModalBody, ModalHeader } from 'flowbite-react';
 
-const ImageModal = ({ images, isOpen, onClose, onRemoveImage, onAddMore }) => {
+const ImageModal = ({ images, isOpen, onClose, onRemoveImage, onAddMore, modalCanDelete }) => {
   return (
     <Modal dismissible show={isOpen} onClose={onClose}>
       <ModalHeader>
@@ -34,6 +34,7 @@ const ImageModal = ({ images, isOpen, onClose, onRemoveImage, onAddMore }) => {
                 alt={`image-${index}`}
                 className='max-h-96 object-contain rounded-md transition-transform duration-200 transform group-hover:scale-105'
               />
+              {modalCanDelete && (
              <button
                 onClick={() => onRemoveImage(index)}
                 className='absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all duration-200'
@@ -43,6 +44,7 @@ const ImageModal = ({ images, isOpen, onClose, onRemoveImage, onAddMore }) => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
+              )}
             </div>
           ))}
         </div>

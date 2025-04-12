@@ -15,6 +15,7 @@ function App() {
   const [attachments, setAttachments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImages, setModalImages] = useState([]);
+  const [modalCanDelete, setModalCanDelete] = useState(true);
 
   // Example function to handle message submission
   const handleMessageSubmit = (event) => {
@@ -60,7 +61,7 @@ function App() {
   };
 
   // pass images to modal
-  const openModalWithImages = (images) => {
+  const openModalWithImages = (images, modalCanDelete = true) => {
     setModalImages(images);
     setIsModalOpen(true);
   };
@@ -129,7 +130,7 @@ function App() {
                             alt={`attachment-${index}`}
                             className='w-10 h-10 object-cover rounded-md'
                             onClick={() =>
-                              openModalWithImages(message.attachments)
+                              openModalWithImages(message.attachments, false)
                             }
                           />
                         ))}
@@ -155,7 +156,7 @@ function App() {
             </form>
             {attachments.length > 0 && (
               <div
-                onClick={() => openModalWithImages(attachments)}
+                onClick={() => openModalWithImages(attachments, true)}
                 className='cursor-pointer relative'
               >
                 <img
@@ -226,11 +227,12 @@ function App() {
         images={modalImages}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onRemoveImage={handleRemoveImage}
+        onRemoveImage={modalCanDelete ? handleRemoveImage : null}
         onAddMore={() => {
           setIsModalOpen(false);
           fileInputRef.current.click();
         }}
+        modalCanDelete={modalCanDelete}
       />
       {/* Footer */}
       <Footer />
