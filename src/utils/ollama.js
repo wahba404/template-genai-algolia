@@ -57,7 +57,7 @@ export const useOllamaChat = () => {
           : 'llama3.2';
 
       const stream = await client.chat({
-        model: modelName,
+        model: 'gemma3', // testing new model, multi-modal built in
         messages: updatedLlmMessages,
         stream: true,
       });
