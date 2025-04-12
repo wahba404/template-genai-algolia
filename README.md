@@ -1,6 +1,8 @@
 # GenAI Toolkit - E-Commerce Starter Template
 
-Welcome to the **GenAI Toolkit**, a starter template designed to kickstart your e-commerce experience with a focus on integrating a chatbot powered by **Ollama** and the **Llama 3.2 model**. Now with **multi-modal capabilities** as well via **Llama 3.2 vision**. This project is built using **React**, **Vite**, **TailwindCSS**, and **Flowbite-React** for a modern and responsive user interface.
+Welcome to the **GenAI Toolkit**, a starter template designed to kickstart your e-commerce experience with a focus on integrating a chatbot powered by ~~**Ollama** and the **Llama 3.2 model**~~ **Gemma3 model**. Now with **multi-modal capabilities** as well via ~~**Llama 3.2 vision**~~ **Gemma3**. This project is built using **React**, **Vite**, **TailwindCSS**, and **Flowbite-React** for a modern and responsive user interface.<br>
+<em> Currently testing Google's Gemma3 model with multi-modal capabilities built in</em>.
+
 
 ---
 
@@ -10,9 +12,16 @@ Before running this project locally, ensure you have the following installed:
 
 1. **Node.js** (v16 or higher) and **npm**.
 2. **Ollama** installed on your machine. You can download it from [Ollama's website](https://ollama.ai/).
-3. The **Llama 3.2 model** installed via Ollama:
+3. The **Gemma3 model** installed via Ollama
+```bash
+ollama pull gemma3
+```
+
+~~The **Llama 3.2 model** installed via Ollama:~~ *(Deprecated)*  
+   > **Note:** If you still wish to use the Llama family of models, you must pull both the base and vision model.  
    ```bash
    ollama pull llama3.2
+   ollama pull llama3.2-vision
    ```
 
 ---
@@ -67,7 +76,7 @@ If you encounter any issues, try the following:
 
 ## Features
 
-- **Chatbot Integration**: A conversational chatbot interface powered by Ollama's Llama 3.2 model.
+- **Chatbot Integration**: A conversational chatbot interface powered by Ollama's wrapper on the Google Gemma3 model.
 - **Multi-Modal Capabilities**: Supports both text and image-based interactions, enabling richer user experiences.
 - **Responsive Design**: Built with TailwindCSS for seamless responsiveness.
 - **Reusable Components**: Includes pre-built components like a carousel.
@@ -84,8 +93,8 @@ The GenAI Toolkit now supports multi-modal interactions, allowing users to:
 
 ### How It Works
 
-- **Text Input**: The chatbot processes user queries using the Llama 3.2 model.
-- **Image Input**: When images are added to the payload, the Llama 3.2-vision model is used to power the request.
+- **Text Input**: The chatbot processes user queries using the Llama 3.2 model <em>(now Gemma3, see above)</em>.
+- **Image Input**: When images are added to the payload, the Llama 3.2-vision model is used to power the request <em>(Gemma3 automatically handles both text and images)</em>.
 - **Seamless Flow**: Text and images are all kept within context to keep the coversation flowing naturally whether its text based, image based, or both!
 
 To enable image-based interactions, ensure you have the necessary dependencies installed. Refer to the `utils/` folder for helper functions related to image processing.
