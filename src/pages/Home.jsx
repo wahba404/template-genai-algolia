@@ -68,7 +68,7 @@ function Home() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 p-6 max-w-full mx-auto grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-4 gap-x-6 gap-y-1 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50 p-6 flex flex-col items-center justify-center space-y-12 dark:bg-gray-900">
         <InstantSearch
           searchClient={searchClient}
           indexName={import.meta.env.VITE_ALGOLIA_INDEX_NAME}
@@ -79,7 +79,7 @@ function Home() {
           {/* ------------------ */}
           {/* Top Section: Search Bar */}
           {/* ------------------ */}
-          <header className="col-span-2">
+          <header className="w-full max-w-4xl">
             <div className="mb-4">
               <SearchBox
                 placeholder=""
@@ -94,25 +94,22 @@ function Home() {
             </div>
           </header>
 
-          {/* Right: Chat Interface */}
-          <ChatInterface />
-
           {/* ------------------ */}
           {/* Row 2, Cols 1-2: Product Grid */}
           {/* ------------------ */}
-          <section className="mt-6 col-span-2">
+          <section className="w-full max-w-4xl mt-6 col-span-2 justify-center items-center">
             <AlgoliaLoadingIndicator />
             <Hits
               hitComponent={({ hit }) => (
                 <Hit hit={hit} highlight={Highlight} />
               )}
               classNames={{
-                list: "grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6",
+                list: "w-full max-w-4xl justify-center grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 place-items-center",
                 item: "",
               }}
             />
             <Pagination
-              className="flex justify-center mt-4"
+              className="flex justify-center mt-6"
               classNames={{
                 list: "flex justify-center px-4 rounded-md dark:bg-gray-800 dark:text-white",
                 item: "px-4",
@@ -121,21 +118,28 @@ function Home() {
             />
           </section>
 
+          {/* Middle Section: Chat Interface */}
+          <div className="w-full max-w-4xl">
+            <ChatInterface />
+          </div>
+
           {/* ------------------ */}
           {/* Bottom Section: Groups and Carousel */}
           {/* ------------------ */}
-          <section className="mt-6 col-span-4 flex items-start gap-6">
+          <section className="w-full max-w-4xl">
             <Carousel />
           </section>
           {/* include a floating cart button in the bottom right */}
-            <Link
-                to="/cart"
-                className={`fixed bottom-4 right-4 bg-blue-200 text-white p-6 rounded-full shadow-lg hover:bg-blue-100 transition-transform transform ${
-                isScrolled ? "scale-100" : "scale-0"
-                }`}
-            >
-                <span className="text-xl font-bold text-black">🛒 {totalQuantity}</span>
-            </Link>
+          <Link
+            to="/cart"
+            className={`fixed bottom-4 right-4 bg-blue-200 text-white p-6 rounded-full shadow-lg hover:bg-blue-100 transition-transform transform ${
+              isScrolled ? "scale-100" : "scale-0"
+            }`}
+          >
+            <span className="text-xl font-bold text-black">
+              🛒 {totalQuantity}
+            </span>
+          </Link>
         </InstantSearch>
       </div>
 

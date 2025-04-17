@@ -14,7 +14,7 @@ function CustomHits(props) {
   }
 
   return (
-    <div className="flex justify-start items-start p-4 m-4">
+    <div className="flex justify-center items-center p-4 m-4">
       <LoadingIndicator />
       <ul className="flex space-x-2">
         {items.map((hit) => (
