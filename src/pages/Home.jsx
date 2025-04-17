@@ -125,8 +125,6 @@ function Home() {
           {/* Bottom Section: Groups and Carousel */}
           {/* ------------------ */}
           <section className="mt-6 col-span-4 flex items-start gap-6">
-            <GroupCard>Group 1</GroupCard>
-            <GroupCard>Group 2</GroupCard>
             <Carousel />
           </section>
           {/* include a floating cart button in the bottom right */}
