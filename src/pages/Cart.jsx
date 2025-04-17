@@ -24,12 +24,15 @@ function Cart() {
       }
     };
     addResponse();
-    console.log(llmMessages)
+    console.log(llmMessages);
   }, [currentCart]);
 
   // Calculate the total amount
   const totalAmount = currentCart.reduce(
-    (total, item) => total + item.price.value * item.quantity,
+    (total, item) =>
+      total +
+      (typeof item.price === "object" ? item.price.value : item.price) *
+        item.quantity,
     0
   );
 
@@ -124,7 +127,9 @@ function Cart() {
                       {item["category"]}
                     </p>
                     <p className="text-lg text-green-600 dark:text-green-400">
-                      ${item["price"]["value"].toFixed(2)}
+                      $
+                      {item["price"]["value"]?.toFixed(2) ||
+                        item["price"].toFixed(2)}
                     </p>
                     <p className="mt-2 text-gray-700 dark:text-gray-300">
                       Quantity: {item["quantity"]}
@@ -182,8 +187,8 @@ function Cart() {
           </div>
         </div>
       </div>
-            {/* Chat Modal */}
-            <DefaultModal
+      {/* Chat Modal */}
+      <DefaultModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title="Chat with us"
