@@ -29,10 +29,7 @@ function Cart() {
 
   // Calculate the total amount
   const totalAmount = currentCart.reduce(
-    (total, item) =>
-      total +
-      (typeof item.price === "object" ? item.price.value : item.price) *
-        item.quantity,
+    (total, item) => total + item.price * item.quantity,
     0
   );
 
@@ -111,28 +108,22 @@ function Cart() {
               >
                 <div className="flex items-center p-4">
                   <img
-                    src={item["image"]}
-                    alt={item["name"]}
+                    src={item.image}
+                    alt={item.name}
                     className="w-32 h-32 object-cover rounded mr-4"
                   />
                   <div className="flex flex-col justify-between">
-                    <Link
-                      to={`/product/${encodeURIComponent(item["objectID"])}`}
-                    >
-                      <h1 className="text-2xl font-bold mb-2">
-                        {item["name"]}
-                      </h1>
+                    <Link to={`/product/${encodeURIComponent(item.objectID)}`}>
+                      <h1 className="text-2xl font-bold mb-2">{item.name}</h1>
                     </Link>
-                    <p className="text-gray-500 dark:text-gray-300 ">
-                      {item["category"]}
+                    <p className="text-gray-500 dark:text-gray-300">
+                      {item.category}
                     </p>
                     <p className="text-lg text-green-600 dark:text-green-400">
-                      $
-                      {item["price"]["value"]?.toFixed(2) ||
-                        item["price"].toFixed(2)}
+                      ${item.price.toFixed(2)}
                     </p>
                     <p className="mt-2 text-gray-700 dark:text-gray-300">
-                      Quantity: {item["quantity"]}
+                      Quantity: {item.quantity}
                     </p>
                     <div className="flex mt-2">
                       <button

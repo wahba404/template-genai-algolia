@@ -13,6 +13,8 @@ import { addToCart } from "../utils/cartUtils";
 import DefaultModal from "../components/common/DefaultModal";
 import ChatInterface from "../components/ChatInterface";
 import { useChat } from "../context/ChatContext";
+import get from "lodash/get";
+import { ProductAttributes } from "../config/attributesMapping";
 
 const searchClient = algoliasearch(
   import.meta.env.VITE_ALGOLIA_APP_ID,
@@ -64,20 +66,23 @@ function ProductDetailPage() {
 
   useEffect(() => {
     const addResponse = async () => {
-      if (response && response.objectID) {
+        if (response && get(response, ProductAttributes.objectID)) {
         const item = {
-          objectID: response.objectID,
-          name: response.name,
-          brand: response.brand,
-          description: response.description,
-          price: response.price.value,
-          image: response.primary_image,
-          category: response.list_categories,
-          reviews: response.reviews,
-          hierarchical_categories: response.hierarchical_categories,
-          color: response.color.original_name,
+          objectID: get(response, ProductAttributes.objectID),
+          name: get(response, ProductAttributes.name),
+          brand: get(response, ProductAttributes.brand),
+          description: get(response, ProductAttributes.description),
+          price: get(response, ProductAttributes.price),
+          image: get(response, ProductAttributes.image),
+          category: get(response, ProductAttributes.category),
+          reviews: get(response, ProductAttributes.reviews),
+          hierarchical_categories: get(
+            response,
+            ProductAttributes.hierarchical_categories
+          ),
+          color: get(response, ProductAttributes.color),
         };
-        const base64Image = await imageToBase64(response.primary_image);
+        const base64Image = await imageToBase64(item.image);
 
         const systemMessage = {
           role: "system",
@@ -106,13 +111,13 @@ function ProductDetailPage() {
     if (!response) return;
 
     const item = {
-      objectID: response.objectID,
-      name: response.name,
-      price: response.price.value,
-      image: response.primary_image,
-      category: response.list_categories?.[0],
-      color: response.color?.original_name,
-    };
+        objectID: get(response, ProductAttributes.objectID),
+        name:     get(response, ProductAttributes.name),
+        price:    get(response, ProductAttributes.price),
+        image:    get(response, ProductAttributes.image),
+        category: get(response, ProductAttributes.category),
+        color:    get(response, ProductAttributes.color),
+      };
 
     addToCart(item, setNotification);
   };
@@ -141,21 +146,21 @@ function ProductDetailPage() {
       </div>
       <article className="flex flex-col items-center">
         <img
-          src={response?.["primary_image"] || product.imageUrl}
-          alt={response?.["name"] || product.name}
+          src={get(response, ProductAttributes.image) || product.imageUrl}
+          alt={get(response, ProductAttributes.name) || product.name}
           className="w-1/2 max-w-xs h-auto mb-4 rounded"
         />
         <h1 className="text-2xl font-bold mb-2 dark:text-white">
-          {response?.["name"] || product.name}
+        {get(response, ProductAttributes.name) || product.name}
         </h1>
         <p className="text-gray-500 dark:text-gray-400">
-          {response?.["list_categories"][0] || product.category}
+        {get(response, ProductAttributes.category) || product.category}
         </p>
         <p className="text-lg text-green-600 dark:text-green-400">
-          ${response?.["price"]["value"] || product.price}
+        ${get(response, ProductAttributes.price)?.toFixed(2) || product.price}
         </p>
         <p className="mt-4 text-gray-700 dark:text-gray-300">
-          {response?.["description"] || product.description}
+        {get(response, ProductAttributes.description) || product.description}
         </p>
         {/*  */}
 
@@ -188,7 +193,7 @@ function ProductDetailPage() {
             indexName={import.meta.env.VITE_ALGOLIA_INDEX_NAME}
           >
             <LookingSimilar
-              objectIDs={[response?.objectID]}
+              objectIDs={[get(response, ProductAttributes.objectID)]}
               limit={5}
               itemComponent={({ item }) => (
                 <Hit hit={item} highlight={Highlight} />
